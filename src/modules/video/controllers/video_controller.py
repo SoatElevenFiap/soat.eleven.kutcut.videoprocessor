@@ -1,14 +1,28 @@
-from modules.shared.adapters import FastAPIController
-from modules.shared.decorators import FastAPIManager
-from http import HTTPMethod
+import json
 
-from modules.video.providers.get_video_process_application_service_provider import GetVideoProcessApplicationServiceProvider
+from aio_pika.abc import AbstractIncomingMessage
 
-@FastAPIManager.controller("video", "Video", version="v1")
-class VideoController(FastAPIController):
-    def __init__(self):
-        super().__init__()
+from modules.shared.adapters.message_broker.message_broker_adapter import (
+    MessageBrokerAdapter,
+)
+from modules.video.models.video_message_model import VideoMessageModel
+from modules.video.services.application.get_video_process_application_service import (
+    GetVideoProcessApplicationService,
+)
 
-    @FastAPIManager.route("/get-process", method=HTTPMethod.GET)
-    async def get_process(self, video_id: str, get_video_process_application_service: GetVideoProcessApplicationServiceProvider):
-        return await get_video_process_application_service.process(video_id)
+
+class VideoController(MessageBrokerAdapter):
+    def __init__(
+        self, video_process_application_service: GetVideoProcessApplicationService
+    ):
+        super().__init__(queue_name="video.process")
+        self.__video_process_application_service = video_process_application_service
+
+    async def consume(self, message: AbstractIncomingMessage):
+        async with message.process(ignore_processed=True):
+            received_message = json.loads(message.body.decode())
+            video_message = VideoMessageModel(**received_message)
+            await self.__video_process_application_service.process(
+                user_id=video_message.user_id,
+                video_id=video_message.video_id,
+            )

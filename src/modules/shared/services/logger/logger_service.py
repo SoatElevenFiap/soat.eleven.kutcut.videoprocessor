@@ -37,7 +37,9 @@ class LoggerService:
         self.logger.bind(correlation_id=get_http_correlation_id()).info(
             f"╔{'═' * (len(message) + 2)}╗"
         )
-        self.logger.bind(correlation_id=get_http_correlation_id()).info(f"║ {message} ║")
+        self.logger.bind(correlation_id=get_http_correlation_id()).info(
+            f"║ {message} ║"
+        )
         self.logger.bind(correlation_id=get_http_correlation_id()).info(
             f"╚{'═' * (len(message) + 2)}╝"
         )
@@ -46,7 +48,9 @@ class LoggerService:
         self.logger.bind(correlation_id=get_http_correlation_id()).warning(
             f"╔{'═' * (len(message) + 2)}╗"
         )
-        self.logger.bind(correlation_id=get_http_correlation_id()).warning(f"║ {message} ║")
+        self.logger.bind(correlation_id=get_http_correlation_id()).warning(
+            f"║ {message} ║"
+        )
         self.logger.bind(correlation_id=get_http_correlation_id()).warning(
             f"╚{'═' * (len(message) + 2)}╝"
         )
@@ -55,7 +59,9 @@ class LoggerService:
         self.logger.bind(correlation_id=get_http_correlation_id()).error(
             f"╔{'═' * (len(message) + 2)}╗"
         )
-        self.logger.bind(correlation_id=get_http_correlation_id()).error(f"║ {message} ║")
+        self.logger.bind(correlation_id=get_http_correlation_id()).error(
+            f"║ {message} ║"
+        )
         self.logger.bind(correlation_id=get_http_correlation_id()).error(
             f"╚{'═' * (len(message) + 2)}╝"
         )

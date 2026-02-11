@@ -5,6 +5,11 @@ description = "Sistema processador de arquivos de vídeo em imagens."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "av>=14.0.0",
+    "aio-pika>=9.4.0",
+    "Pillow>=11.0.0",
+    "aiohttp>=3.11.0",
+    "azure-storage-blob>=12.22.0",
     "fastapi[standard]>=0.128.0",
     "loguru>=0.7.3",
     "pydantic>=2.12.5",
@@ -27,7 +32,8 @@ dev = [
 
 [tool.taskipy.tasks]
 lint = "ruff check src --fix && black src && isort src"
-run_dev = "fastapi dev src/main.py"
+run_dev = "python src/main.py"
+run_worker = "python src/main.py"
 test = "pytest src/tests/ -v --cov=src --cov-report=xml --cov-report=html --cov-report=term"
 test_watch = "pytest src/tests/ -v --cov=src --cov-report=term --watch"
 test_bdd = "pytest src/tests/ -m bdd"

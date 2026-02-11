@@ -1,24 +1,36 @@
-import os
+import asyncio
+import sys
 
-import pytomlpp
-from fastapi import FastAPI
+from aio_pika import connect_robust
 
-from modules.shared.decorators import FastAPIManager
-from modules.shared.middlewares import HttpCorrelationMiddleware
-from modules.shared.providers import SettingsProvider
+from containers import containers
+from modules.shared.services.settings.settings import Settings
+from modules.video.controllers.video_controller import VideoController
 
-app = FastAPI()
-FastAPIManager.initialize(app)
 
-app.add_middleware(HttpCorrelationMiddleware)
-
-@app.get("/health-check", tags=["Health"])
-async def health_check(settings: SettingsProvider):
-    project_info = pytomlpp.load(
-        os.path.join(os.path.dirname(os.path.dirname(__file__)), "pyproject.toml")
+async def run_worker() -> None:
+    settings = Settings()
+    connection = await connect_robust(settings.rabbitmq_url)
+    channel = await connection.channel()
+    await channel.set_qos(prefetch_count=1)
+    queue = await channel.declare_queue(
+        settings.rabbitmq_queue_video_process, durable=True
     )
-    return {
-        "message": "Video Processor is running",
-        "version": project_info["project"]["version"],
-        "environment": settings.environment,
-    }
+    video_controller = VideoController(containers.video_process_application_service)
+    await queue.consume(video_controller.consume)
+    try:
+        await asyncio.Future()
+    except asyncio.CancelledError:
+        await connection.close()
+        raise
+
+
+def main() -> None:
+    try:
+        asyncio.run(run_worker())
+    except KeyboardInterrupt:
+        sys.exit(0)
+
+
+if __name__ == "__main__":
+    main()
