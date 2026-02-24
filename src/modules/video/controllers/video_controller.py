@@ -24,5 +24,6 @@ class VideoController(MessageBrokerAdapter):
             video_message = VideoMessageModel(**received_message)
             await self.__video_process_application_service.process(
                 user_id=video_message.user_id,
-                video_id=video_message.video_id,
+                filename=video_message.filename,
+                message_id=video_message.message_id,
             )

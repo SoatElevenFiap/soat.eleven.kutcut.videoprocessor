@@ -17,6 +17,7 @@ async def run_worker() -> None:
         settings.rabbitmq_queue_video_process, durable=True
     )
     video_controller = VideoController(containers.video_process_application_service)
+    print(f"Worker started. Waiting for messages on queue: {settings.rabbitmq_queue_video_process}")
     await queue.consume(video_controller.consume)
     try:
         await asyncio.Future()

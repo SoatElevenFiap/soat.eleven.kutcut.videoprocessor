@@ -7,7 +7,8 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     environment: Optional[str] = None
     rabbitmq_url: str = "amqp://guest:guest@localhost:5672/"
-    rabbitmq_queue_video_process: str = "video.process"
+    rabbitmq_queue_video_process: str = "video_uploaded"
+    rabbitmq_queue_video_process_completed: str = "processamento_de_videos"
     blob_storage_connection_string: str = ""
     blob_storage_container_name: str = "videos"
 

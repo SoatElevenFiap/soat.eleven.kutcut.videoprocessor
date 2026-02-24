@@ -2,8 +2,6 @@ import sys
 
 from loguru import logger
 
-from modules.shared.middlewares import get_http_correlation_id
-
 
 class LoggerService:
     def __init__(self, context: str):
@@ -16,64 +14,64 @@ class LoggerService:
         logger.add(
             sys.stdout,
             colorize=True,
-            format="     <level> {level:>4} </level>  <yellow>[{extra[correlation_id]}]</yellow> - {message} <dim>({file}:{line})</dim>",
+            format="<level> {level:>4} </level> - {message} <dim>({file}:{line})</dim>",
         )
         self.logger = logger.bind(context=context)
         self.logger = self.logger.opt(depth=1, colors=False)
 
     def debug(self, message):
-        self.logger.bind(correlation_id=get_http_correlation_id()).debug(message)
+        self.logger.bind().debug(message)
 
     def info(self, message):
-        self.logger.bind(correlation_id=get_http_correlation_id()).info(message)
+        self.logger.bind().info(message)
 
     def warning(self, message):
-        self.logger.bind(correlation_id=get_http_correlation_id()).warning(message)
+        self.logger.bind().warning(message)
 
     def error(self, message):
-        self.logger.bind(correlation_id=get_http_correlation_id()).error(message)
+        self.logger.bind().error(message)
 
     def title_box(self, message):
-        self.logger.bind(correlation_id=get_http_correlation_id()).info(
+        self.logger.bind().info(
             f"╔{'═' * (len(message) + 2)}╗"
         )
-        self.logger.bind(correlation_id=get_http_correlation_id()).info(
+        self.logger.bind().info(
             f"║ {message} ║"
         )
-        self.logger.bind(correlation_id=get_http_correlation_id()).info(
+        self.logger.bind().info(
             f"╚{'═' * (len(message) + 2)}╝"
         )
 
     def title_box_warning(self, message):
-        self.logger.bind(correlation_id=get_http_correlation_id()).warning(
+        self.logger.bind().warning(
             f"╔{'═' * (len(message) + 2)}╗"
         )
-        self.logger.bind(correlation_id=get_http_correlation_id()).warning(
+        self.logger.bind().warning(
             f"║ {message} ║"
         )
-        self.logger.bind(correlation_id=get_http_correlation_id()).warning(
+        self.logger.bind().warning(
             f"╚{'═' * (len(message) + 2)}╝"
         )
 
     def title_box_error(self, message):
-        self.logger.bind(correlation_id=get_http_correlation_id()).error(
+        self.logger.bind().error(
             f"╔{'═' * (len(message) + 2)}╗"
         )
-        self.logger.bind(correlation_id=get_http_correlation_id()).error(
+        self.logger.bind().error(
             f"║ {message} ║"
         )
-        self.logger.bind(correlation_id=get_http_correlation_id()).error(
+        self.logger.bind().error(
             f"╚{'═' * (len(message) + 2)}╝"
         )
 
     def dict_to_table(self, message: dict):
-        self.logger.bind(correlation_id=get_http_correlation_id()).info(
+        self.logger.bind().info(
             f"╔{'═' * (len(message) + 30)}╗"
         )
         for key, value in message.items():
-            self.logger.bind(correlation_id=get_http_correlation_id()).info(
+            self.logger.bind().info(
                 f"║ {key}: {value}"
             )
-        self.logger.bind(correlation_id=get_http_correlation_id()).info(
+        self.logger.bind().info(
             f"╚{'═' * (len(message) + 30)}╝"
         )

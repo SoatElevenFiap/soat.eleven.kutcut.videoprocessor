@@ -13,14 +13,14 @@ class DownloadVideoDomainService(DomainService):
         super().__init__(DownloadVideoDomainService.__name__)
         self.__blob_storage = blob_storage
 
-    async def process(self, user_id: str, video_id: str) -> Optional[VideoEntity]:
+    async def process(self, user_id: str, filename: str) -> Optional[VideoEntity]:
         self.logger.info(
-            "Downloading video for user id " + user_id + " and video id " + video_id,
+            "Downloading video for user id " + user_id + " and filename " + filename,
         )
-        path = f"{user_id}/videos/{video_id}.mkv"
+        path = f"{user_id}/videos/{filename}"
         if not await self.__blob_storage.exists(path):
             raise VideoNotFoundException(
-                f"Video not found for user id {user_id} and video id {video_id}"
+                f"Video not found for user id {user_id} and filename {filename}"
             )
 
         data = await self.__blob_storage.download_file(path)
@@ -31,7 +31,7 @@ class DownloadVideoDomainService(DomainService):
 
         return VideoEntity(
             user_id=user_id,
-            video_id=video_id,
+            video_id=filename,
             data=data,
             size_bytes=len(data),
             duration_seconds=duration_seconds,
