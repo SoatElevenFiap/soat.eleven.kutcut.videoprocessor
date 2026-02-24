@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     rabbitmq_url: str = "amqp://guest:guest@localhost:5672/"
     rabbitmq_queue_video_process: str = "video_uploaded"
     rabbitmq_queue_video_process_completed: str = "processamento_de_videos"
+    rabbitmq_prefetch_count: int = 10
     blob_storage_connection_string: str = ""
     blob_storage_container_name: str = "videos"
 

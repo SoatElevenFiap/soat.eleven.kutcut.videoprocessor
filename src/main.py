@@ -12,7 +12,7 @@ async def run_worker() -> None:
     settings = Settings()
     connection = await connect_robust(settings.rabbitmq_url)
     channel = await connection.channel()
-    await channel.set_qos(prefetch_count=1)
+    await channel.set_qos(prefetch_count=settings.rabbitmq_prefetch_count)
     queue = await channel.declare_queue(
         settings.rabbitmq_queue_video_process, durable=True
     )

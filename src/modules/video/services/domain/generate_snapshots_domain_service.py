@@ -13,6 +13,13 @@ class GenerateSnapshotsDomainService(DomainService):
         super().__init__(GenerateSnapshotsDomainService.__name__)
         self.__blob_storage = blob_storage
 
+    def _create_zip_buffer(self, frames: list[tuple[str, bytes]]) -> bytes:
+        zip_buffer = io.BytesIO()
+        with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
+            for name, jpeg_bytes in frames:
+                zipf.writestr(name, jpeg_bytes)
+        return zip_buffer.getvalue()
+
     async def process(self, video: VideoEntity) -> VideoEntity:
         self.logger.info(
             "Generating snapshots for video id " + video.video_id
@@ -32,16 +39,14 @@ class GenerateSnapshotsDomainService(DomainService):
         self.logger.info(
             "Zipping frames...",
         )
-        zip_buffer = io.BytesIO()
-        with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
-            for name, jpeg_bytes in frames:
-                zipf.writestr(name, jpeg_bytes)
+        
+        zip_bytes = await asyncio.to_thread(self._create_zip_buffer, frames)
 
         self.logger.info(
             "Uploading zip to blob storage...",
         )
         zip_path = f"{video.user_id}/thumbnails/{video.video_id}.zip"
-        await self.__blob_storage.upload_file(zip_path, zip_buffer.getvalue())
+        await self.__blob_storage.upload_file(zip_path, zip_bytes)
         self.logger.info(
             "Zip uploaded to blob storage",
         )
