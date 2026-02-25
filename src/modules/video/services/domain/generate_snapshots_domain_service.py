@@ -22,7 +22,8 @@ class GenerateSnapshotsDomainService(DomainService):
 
     async def process(self, video: VideoEntity) -> VideoEntity:
         self.logger.info(
-            "Generating snapshots for video id " + video.video_id
+            "Generating snapshots for video id "
+            + video.video_id
             + " (single-pass decode, may take a while for long videos)",
         )
         frames = await asyncio.to_thread(
@@ -39,7 +40,7 @@ class GenerateSnapshotsDomainService(DomainService):
         self.logger.info(
             "Zipping frames...",
         )
-        
+
         zip_bytes = await asyncio.to_thread(self._create_zip_buffer, frames)
 
         self.logger.info(

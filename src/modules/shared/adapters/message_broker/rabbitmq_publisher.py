@@ -13,10 +13,10 @@ class RabbitMQPublisher:
             async with connection:
                 channel = await connection.channel()
                 await channel.declare_queue(queue_name, durable=True)
-                
+
                 body = json.dumps(message).encode()
                 msg = Message(body=body)
-                
+
                 await channel.default_exchange.publish(
                     msg,
                     routing_key=queue_name,

@@ -21,6 +21,7 @@ dependencies = [
 [dependency-groups]
 dev = [
     "black>=26.1.0",
+    "bump-pydantic>=0.8.0",
     "faker>=40.1.2",
     "isort>=7.0.0",
     "pytest>=9.0.2",

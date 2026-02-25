@@ -32,46 +32,22 @@ class LoggerService:
         self.logger.bind().error(message)
 
     def title_box(self, message):
-        self.logger.bind().info(
-            f"╔{'═' * (len(message) + 2)}╗"
-        )
-        self.logger.bind().info(
-            f"║ {message} ║"
-        )
-        self.logger.bind().info(
-            f"╚{'═' * (len(message) + 2)}╝"
-        )
+        self.logger.bind().info(f"╔{'═' * (len(message) + 2)}╗")
+        self.logger.bind().info(f"║ {message} ║")
+        self.logger.bind().info(f"╚{'═' * (len(message) + 2)}╝")
 
     def title_box_warning(self, message):
-        self.logger.bind().warning(
-            f"╔{'═' * (len(message) + 2)}╗"
-        )
-        self.logger.bind().warning(
-            f"║ {message} ║"
-        )
-        self.logger.bind().warning(
-            f"╚{'═' * (len(message) + 2)}╝"
-        )
+        self.logger.bind().warning(f"╔{'═' * (len(message) + 2)}╗")
+        self.logger.bind().warning(f"║ {message} ║")
+        self.logger.bind().warning(f"╚{'═' * (len(message) + 2)}╝")
 
     def title_box_error(self, message):
-        self.logger.bind().error(
-            f"╔{'═' * (len(message) + 2)}╗"
-        )
-        self.logger.bind().error(
-            f"║ {message} ║"
-        )
-        self.logger.bind().error(
-            f"╚{'═' * (len(message) + 2)}╝"
-        )
+        self.logger.bind().error(f"╔{'═' * (len(message) + 2)}╗")
+        self.logger.bind().error(f"║ {message} ║")
+        self.logger.bind().error(f"╚{'═' * (len(message) + 2)}╝")
 
     def dict_to_table(self, message: dict):
-        self.logger.bind().info(
-            f"╔{'═' * (len(message) + 30)}╗"
-        )
+        self.logger.bind().info(f"╔{'═' * (len(message) + 30)}╗")
         for key, value in message.items():
-            self.logger.bind().info(
-                f"║ {key}: {value}"
-            )
-        self.logger.bind().info(
-            f"╚{'═' * (len(message) + 30)}╝"
-        )
+            self.logger.bind().info(f"║ {key}: {value}")
+        self.logger.bind().info(f"╚{'═' * (len(message) + 30)}╝")

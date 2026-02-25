@@ -2,7 +2,9 @@ import io
 
 import av
 
-MAX_DURATION_SECONDS = 604_800  # 7 dias; evita MemoryError se metadados vierem em unidade errada
+MAX_DURATION_SECONDS = (
+    604_800  # 7 dias; evita MemoryError se metadados vierem em unidade errada
+)
 MAX_SNAPSHOTS = 5000  # limite de thumbnails por vídeo
 
 

@@ -1,10 +1,8 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class VideoMessageModel(BaseModel):
     user_id: str = Field(alias="userId")
     filename: str
     message_id: str = Field(alias="messageId")
-
-    class Config:
-        populate_by_name = True
+    model_config = ConfigDict(populate_by_name=True)

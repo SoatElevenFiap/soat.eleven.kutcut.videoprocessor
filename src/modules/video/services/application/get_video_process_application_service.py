@@ -37,8 +37,10 @@ class GetVideoProcessApplicationService(ApplicationService):
                 user_id=user_id,
                 filename=filename,
             )
-            generated_video = await self.__generate_snapshots_domain_service.process(video)
-            
+            generated_video = await self.__generate_snapshots_domain_service.process(
+                video
+            )
+
             payload = {
                 "userId": user_id,
                 "filename": filename,

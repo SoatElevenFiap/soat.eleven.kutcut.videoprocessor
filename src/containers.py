@@ -35,10 +35,12 @@ class Containers:
             else None
         )
         download_video_domain_service = DownloadVideoDomainService(self._blob_storage)
-        generate_snapshots_domain_service = GenerateSnapshotsDomainService(self._blob_storage)
+        generate_snapshots_domain_service = GenerateSnapshotsDomainService(
+            self._blob_storage
+        )
         self.rabbitmq_publisher = RabbitMQPublisher(settings.rabbitmq_url)
         self.publish_message_service = PublishMessageService(self.rabbitmq_publisher)
-        
+
         self.video_process_application_service = GetVideoProcessApplicationService(
             download_video_domain_service=download_video_domain_service,
             generate_snapshots_domain_service=generate_snapshots_domain_service,
