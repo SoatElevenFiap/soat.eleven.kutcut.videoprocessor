@@ -79,7 +79,9 @@ omit = [
     "*/enums/*",
     "*/dtos/*",
     "*/exceptions/*",
-    "*/decorators/*"
+    "*/decorators/*",
+    "*/containers.py",
+    "*/constants.py",
 ]
 
 [tool.coverage.report]
