@@ -1,0 +1,32 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: kutcut-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  videoprocessor:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: kutcut-videoprocessor:latest
+    container_name: kutcut-videoprocessor
+    env_file:
+      - .env
+    environment:
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+      ENVIRONMENT: development
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    restart: unless-stopped

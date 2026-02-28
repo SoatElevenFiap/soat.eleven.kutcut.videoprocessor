@@ -1,0 +1,41 @@
+# Virtual env local (recriado no build)
+.venv
+venv
+env
+
+# Cache e artefatos
+__pycache__
+*.py[cod]
+*$py.class
+.pytest_cache
+.coverage
+htmlcov
+*.xml
+.ruff_cache
+.mypy_cache
+
+# Controle de versão
+.git
+.gitignore
+.github
+
+# IDE e OS
+.idea
+.vscode
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Testes e dev (não necessários na imagem de produção)
+tests
+src/tests
+*.md
+!README.md
+
+# Docker
+Dockerfile*
+.dockerignore
+docker-compose*
+.env
+.env.*

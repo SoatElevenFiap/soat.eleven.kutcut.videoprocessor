@@ -21,7 +21,7 @@ class AzureBlobStorageService(BlobStorageAdapter):
 
     async def upload_file(self, path: str, data: bytes) -> None:
         blob_client = self.__client.get_blob_client(self.__container_name, path)
-        await blob_client.upload_blob(data)
+        await blob_client.upload_blob(data, overwrite=True)
 
     async def exists(self, path: str) -> bool:
         blob_client = self.__client.get_blob_client(self.__container_name, path)
