@@ -69,6 +69,7 @@ class TestGetVideoProcessApplicationService:
             "filename": filename,
             "messageId": message_id,
             "thumbnailsPath": video_entity.thumbnails_path,
+            "status": 4,
             "result": "success",
             "code": "S200",
         }
@@ -96,6 +97,7 @@ class TestGetVideoProcessApplicationService:
             "userId": user_id,
             "filename": filename,
             "messageId": message_id,
+            "status": 5,
             "result": "error",
             "code": "E404",
         }
@@ -125,6 +127,7 @@ class TestGetVideoProcessApplicationService:
             "userId": user_id,
             "filename": filename,
             "messageId": message_id,
+            "status": 5,
             "result": "error",
             "code": "E500",
         }
