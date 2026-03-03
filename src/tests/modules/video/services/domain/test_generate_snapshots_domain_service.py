@@ -54,8 +54,10 @@ class TestGenerateSnapshotsDomainService:
         )
 
         assert result_video is video_entity
+        import os
+        video_name = os.path.splitext(video_entity.video_id)[0]
         expected_zip_path = (
-            f"{video_entity.user_id}/thumbnails/{video_entity.video_id}.zip"
+            f"{video_entity.user_id}/thumbnails/{video_name}.zip"
         )
         assert result_video.thumbnails_path == expected_zip_path
 

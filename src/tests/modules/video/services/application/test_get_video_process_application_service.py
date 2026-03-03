@@ -55,22 +55,22 @@ class TestGetVideoProcessApplicationService:
     ):
         user_id = video_entity.user_id
         filename = video_entity.video_id
+        title = self.faker.sentence()
         message_id = self.faker.uuid4()
 
         self.download_service.process.return_value = video_entity
         self.generate_service.process.return_value = video_entity
 
         result = await application_service.process(
-            user_id=user_id, filename=filename, message_id=message_id
+            user_id=user_id, filename=filename, title=title, message_id=message_id
         )
 
         expected_payload = {
             "userId": user_id,
             "filename": filename,
+            "title": title,
             "messageId": message_id,
-            "thumbnailsPath": video_entity.thumbnails_path,
-            "result": "success",
-            "code": "S200",
+            "status": 4,
         }
 
         assert result == expected_payload
@@ -84,20 +84,21 @@ class TestGetVideoProcessApplicationService:
     ):
         user_id = self.faker.uuid4()
         filename = self.faker.file_name(category="video")
+        title = self.faker.sentence()
         message_id = self.faker.uuid4()
 
         self.download_service.process.side_effect = VideoNotFoundException("not found")
 
         result = await application_service.process(
-            user_id=user_id, filename=filename, message_id=message_id
+            user_id=user_id, filename=filename, title=title, message_id=message_id
         )
 
         expected_payload = {
             "userId": user_id,
             "filename": filename,
+            "title": title,
             "messageId": message_id,
-            "result": "error",
-            "code": "E404",
+            "status": 5,
         }
 
         assert result == expected_payload
@@ -112,21 +113,22 @@ class TestGetVideoProcessApplicationService:
     ):
         user_id = self.faker.uuid4()
         filename = self.faker.file_name(category="video")
+        title = self.faker.sentence()
         message_id = self.faker.uuid4()
 
         self.download_service.process.side_effect = Exception("unexpected error")
 
         with pytest.raises(Exception, match="unexpected error"):
             await application_service.process(
-                user_id=user_id, filename=filename, message_id=message_id
+                user_id=user_id, filename=filename, title=title, message_id=message_id
             )
 
         expected_payload = {
             "userId": user_id,
             "filename": filename,
+            "title": title,
             "messageId": message_id,
-            "result": "error",
-            "code": "E500",
+            "status": 5,
         }
         self.publish_service.publish.assert_called_once_with(
             "test_queue", expected_payload

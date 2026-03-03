@@ -26,7 +26,7 @@ class GetVideoProcessApplicationService(ApplicationService):
         self.__publish_message_service = publish_message_service
         self.__settings = settings
 
-    async def process(self, user_id: str, filename: str, message_id: str) -> dict:
+    async def process(self, user_id: str, filename: str, title: str, message_id: str) -> dict:
         self.logger.info(
             f"Getting video process for user id {user_id} and filename {filename}",
         )
@@ -44,10 +44,9 @@ class GetVideoProcessApplicationService(ApplicationService):
             payload = {
                 "userId": user_id,
                 "filename": filename,
+                "title": title,
                 "messageId": message_id,
-                "thumbnailsPath": generated_video.thumbnails_path,
-                "result": "success",
-                "code": "S200",
+                "status": 4,
             }
             await self.__publish_message_service.publish(queue_name, payload)
 
@@ -63,9 +62,9 @@ class GetVideoProcessApplicationService(ApplicationService):
             payload = {
                 "userId": user_id,
                 "filename": filename,
+                "title": title,
                 "messageId": message_id,
-                "result": "error",
-                "code": "E404",
+                "status": 5,
             }
             await self.__publish_message_service.publish(queue_name, payload)
             return payload
@@ -76,9 +75,9 @@ class GetVideoProcessApplicationService(ApplicationService):
             payload = {
                 "userId": user_id,
                 "filename": filename,
+                "title": title,
                 "messageId": message_id,
-                "result": "error",
-                "code": "E500",
+                "status": 5,
             }
             await self.__publish_message_service.publish(queue_name, payload)
             raise e

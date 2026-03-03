@@ -25,5 +25,6 @@ class VideoController(MessageBrokerAdapter):
             await self.__video_process_application_service.process(
                 user_id=video_message.user_id,
                 filename=video_message.filename,
+                title=video_message.title,
                 message_id=video_message.message_id,
             )

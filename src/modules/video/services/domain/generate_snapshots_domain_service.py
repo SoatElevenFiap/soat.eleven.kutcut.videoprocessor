@@ -1,5 +1,6 @@
 import asyncio
 import io
+import os
 import zipfile
 
 from modules.shared.adapters import DomainService
@@ -46,7 +47,8 @@ class GenerateSnapshotsDomainService(DomainService):
         self.logger.info(
             "Uploading zip to blob storage...",
         )
-        zip_path = f"{video.user_id}/thumbnails/{video.video_id}.zip"
+        video_name = os.path.splitext(video.video_id)[0]
+        zip_path = f"{video.user_id}/thumbnails/{video_name}.zip"
         await self.__blob_storage.upload_file(zip_path, zip_bytes)
         self.logger.info(
             "Zip uploaded to blob storage",

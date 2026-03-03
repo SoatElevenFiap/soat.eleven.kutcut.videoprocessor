@@ -33,11 +33,13 @@ class TestVideoController:
 
         user_id = self.faker.uuid4()
         filename = self.faker.file_name(category="video")
+        title = self.faker.sentence()
         message_id = self.faker.uuid4()
 
         payload = {
             "userId": user_id,
             "filename": filename,
+            "title": title,
             "messageId": message_id,
         }
         message.body = json.dumps(payload).encode()
@@ -48,5 +50,6 @@ class TestVideoController:
         application_service.process.assert_called_once_with(
             user_id=user_id,
             filename=filename,
+            title=title,
             message_id=message_id,
         )
