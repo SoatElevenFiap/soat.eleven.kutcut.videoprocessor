@@ -1,0 +1,81 @@
+namespace:
+  name: kutcut
+  create: false
+  labels:
+    name: kutcut
+
+replicaCount: 1
+
+image:
+  repository: acrkutcutpostech029.azurecr.io/kutcut/videoprocessor
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: []
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: false
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+securityContext: {}
+
+service:
+  create: false
+  type: ClusterIP
+  port: 80
+  targetPort: 8000
+  name: videoprocessor
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+livenessProbe:
+  exec:
+    command: ["python", "-c", "import sys; sys.exit(0)"]
+  initialDelaySeconds: 40
+  periodSeconds: 30
+  timeoutSeconds: 10
+  failureThreshold: 3
+
+readinessProbe:
+  exec:
+    command: ["python", "-c", "import sys; sys.exit(0)"]
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Variáveis de ambiente (sensíveis via Secret no cluster)
+env:
+  ENVIRONMENT: "production"
+  RABBITMQ_PREFETCH_COUNT: "10"
+  BLOB_STORAGE_CONTAINER_NAME: "videos"
+  # RABBITMQ_URL, RABBITMQ_QUEUE_VIDEO_PROCESS, RABBITMQ_QUEUE_VIDEO_PROCESS_COMPLETED,
+  # BLOB_STORAGE_CONNECTION_STRING devem ser injetadas via Secret/envFrom
+
+networkPolicy:
+  enabled: true
+  allowedNamespaces:
+    - name: kutcut
+    - name: gateway
+    - name: istio-system
+    - name: kong

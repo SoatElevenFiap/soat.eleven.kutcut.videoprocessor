@@ -70,7 +70,10 @@ class TestGetVideoProcessApplicationService:
             "filename": filename,
             "title": title,
             "messageId": message_id,
+            "thumbnailsPath": video_entity.thumbnails_path,
             "status": 4,
+            "result": "success",
+            "code": "S200",
         }
 
         assert result == expected_payload
@@ -99,6 +102,8 @@ class TestGetVideoProcessApplicationService:
             "title": title,
             "messageId": message_id,
             "status": 5,
+            "result": "error",
+            "code": "E404",
         }
 
         assert result == expected_payload
@@ -129,6 +134,8 @@ class TestGetVideoProcessApplicationService:
             "title": title,
             "messageId": message_id,
             "status": 5,
+            "result": "error",
+            "code": "E500",
         }
         self.publish_service.publish.assert_called_once_with(
             "test_queue", expected_payload

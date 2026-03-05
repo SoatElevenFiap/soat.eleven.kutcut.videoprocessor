@@ -46,7 +46,10 @@ class GetVideoProcessApplicationService(ApplicationService):
                 "filename": filename,
                 "title": title,
                 "messageId": message_id,
+                "thumbnailsPath": generated_video.thumbnails_path,
                 "status": 4,
+                "result": "success",
+                "code": "S200",
             }
             await self.__publish_message_service.publish(queue_name, payload)
 
@@ -65,6 +68,8 @@ class GetVideoProcessApplicationService(ApplicationService):
                 "title": title,
                 "messageId": message_id,
                 "status": 5,
+                "result": "error",
+                "code": "E404",
             }
             await self.__publish_message_service.publish(queue_name, payload)
             return payload
@@ -78,6 +83,8 @@ class GetVideoProcessApplicationService(ApplicationService):
                 "title": title,
                 "messageId": message_id,
                 "status": 5,
+                "result": "error",
+                "code": "E500",
             }
             await self.__publish_message_service.publish(queue_name, payload)
             raise e

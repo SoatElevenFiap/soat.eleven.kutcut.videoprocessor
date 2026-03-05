@@ -1,0 +1,6 @@
+apiVersion: v2
+name: kutcut-videoprocessor
+description: Helm chart for Kutcut Video Processor Worker (soat.eleven.kutcut.videoprocessor)
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
