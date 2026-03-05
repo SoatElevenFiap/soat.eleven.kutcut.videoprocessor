@@ -15,6 +15,7 @@ class FakerVideoMessageModel:
         default_payload = {
             "user_id": faker.uuid4(),
             "filename": faker.file_name(category="video"),
+            "title": faker.sentence(),
             "message_id": faker.uuid4(),
         }
         return VideoMessageModel(**{**default_payload, **payload})
