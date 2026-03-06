@@ -12,47 +12,66 @@ spec:
       {{- include "videoprocessor.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
-      annotations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
       labels:
         {{- include "videoprocessor.selectorLabels" . | nindent 8 }}
+        azure.workload.identity/use: "true"
     spec:
-      {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
       serviceAccountName: {{ include "videoprocessor.serviceAccountName" . }}
-      securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-            {{- range $key, $value := .Values.env }}
-            - name: {{ $key }}
-              value: {{ $value | quote }}
-            {{- end }}
+            - name: ENVIRONMENT
+              value: "production"
+            - name: RABBITMQ_QUEUE_VIDEO_PROCESS
+              value: {{ .Values.config.rabbitmq.queueVideoProcess | quote }}
+            - name: RABBITMQ_QUEUE_VIDEO_PROCESS_COMPLETED
+              value: {{ .Values.config.rabbitmq.queueVideoProcessCompleted | quote }}
+            - name: RABBITMQ_PREFETCH_COUNT
+              value: {{ .Values.config.rabbitmq.prefetchCount | quote }}
+            - name: BLOB_STORAGE_CONTAINER_NAME
+              value: {{ .Values.config.blobStorage.containerName | quote }}
+            
+            # Pegando usuário e senha do segredo criado pelo CSI Driver
+            - name: RABBITMQ_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "videoprocessor.fullname" . }}-secret
+                  key: RABBITMQ_USER
+            - name: RABBITMQ_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "videoprocessor.fullname" . }}-secret
+                  key: RABBITMQ_PASS
+            - name: BLOB_STORAGE_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "videoprocessor.fullname" . }}-secret
+                  key: BLOB_STORAGE_CONNECTION_STRING
+
+            # Montando a URL final para o Python
+            - name: RABBITMQ_URL
+              value: "amqp://$(RABBITMQ_USER):$(RABBITMQ_PASS)@{{ .Values.config.rabbitmq.host }}:{{ .Values.config.rabbitmq.port }}/"
+
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:
             {{- toYaml .Values.readinessProbe | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-      {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-
+          volumeMounts:
+            {{- if .Values.keyVault.enabled }}
+            - name: secrets-store-inline
+              mountPath: "/mnt/secrets-store"
+              readOnly: true
+            {{- end }}
+      volumes:
+        {{- if .Values.keyVault.enabled }}
+        - name: secrets-store-inline
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: {{ include "videoprocessor.fullname" . }}-kv
+        {{- end }}
