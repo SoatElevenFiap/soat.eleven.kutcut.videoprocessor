@@ -28,7 +28,7 @@ jobs:
 
       # 1. Login no Azure (OIDC)
       - name: Azure Login
-        uses: azure/login@v2
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID_KAUAN }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID_KAUAN }}
@@ -57,7 +57,7 @@ jobs:
 
       # 5. Setup Helm
       - name: Setup Helm
-        uses: azure/setup-helm@v3
+        uses: azure/setup-helm@fe7b4081f897010303f10b3ad114f27994073bc3
         with:
           version: v3.15.1
 
@@ -78,6 +78,10 @@ jobs:
 
       # 8. Deploy da Aplicação (Com rollback automático)
       - name: Deploy Application via Helm
+        env:
+          KV_CLIENT_ID: ${{ secrets.KV_IDENTITY_CLIENT_ID }}
+          AZ_TENANT_ID: ${{ secrets.AZURE_TENANT_ID_KAUAN }}
+          KV_SUFFIX: ${{ secrets.KV_SUFFIX }}
         run: |
           echo "🚀 Deploy Atômico com Helm em $NAMESPACE..."
           helm upgrade --install $RELEASE_NAME $CHART_PATH \
@@ -86,7 +90,7 @@ jobs:
             --set image.repository=$REGISTRY/$APP_IMAGE_NAME \
             --set image.tag=${{ github.sha }} \
             --set keyVault.enabled=true \
-            --set keyVault.name="kv-kutcut-${{ secrets.KV_SUFFIX }}" \
-            --set keyVault.tenantId="${{ secrets.AZURE_TENANT_ID_KAUAN }}" \
-            --set keyVault.clientId="${{ secrets.KV_IDENTITY_CLIENT_ID }}" \
+            --set keyVault.name="$KV_SUFFIX" \
+            --set keyVault.clientId="$KV_CLIENT_ID" \
+            --set keyVault.tenantId="$AZ_TENANT_ID" \
             --atomic

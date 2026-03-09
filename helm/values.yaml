@@ -26,7 +26,7 @@ config:
 
 # Integração com Key Vault (Workload Identity)
 keyVault:
-  enabled: false
+  enabled: true
   name: ""
   tenantId: ""
   clientId: "" # Managed Identity Client ID
