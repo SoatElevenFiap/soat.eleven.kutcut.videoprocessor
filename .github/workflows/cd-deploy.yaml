@@ -34,6 +34,7 @@ jobs:
           client-id: ${{ secrets.AZURE_CLIENT_ID_KAUAN }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID_KAUAN }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID_KAUAN }}
+
       # 2. Login no ACR
       - name: Azure Container Registry Login
         run: az acr login --name acrkutcutpostech
@@ -42,7 +43,7 @@ jobs:
       - name: Build and push Docker images
         run: |
           # Build da imagem da API (estágio 'final')
-          docker build --target final -t $REGISTRY/$APP_IMAGE_NAME:${{ github.sha }} -t $REGISTRY/$APP_IMAGE_NAME:latest .
+          docker build --target runtime -t $REGISTRY/$APP_IMAGE_NAME:${{ github.sha }} -t $REGISTRY/$APP_IMAGE_NAME:latest .
           
           docker push $REGISTRY/$APP_IMAGE_NAME:${{ github.sha }}
           docker push $REGISTRY/$APP_IMAGE_NAME:latest
