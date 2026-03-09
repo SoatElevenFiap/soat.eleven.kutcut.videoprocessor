@@ -3,7 +3,7 @@ name: CD - Deploy FastFood to AKS
 on:
   push:
     branches:
-      - cd/teste
+      - main
   workflow_dispatch:
 
 env:
