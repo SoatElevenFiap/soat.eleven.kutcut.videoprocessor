@@ -58,7 +58,7 @@ jobs:
 
       # 5. Setup Helm
       - name: Setup Helm
-        uses: uses: azure/setup-helm@v4.2.0
+        uses: azure/setup-helm@v4.2.0
         with:
           version: v3.15.1
 
