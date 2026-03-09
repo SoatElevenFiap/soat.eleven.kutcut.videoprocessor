@@ -21,7 +21,6 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 # Código da aplicação
 COPY src ./src
-COPY containers.py ./
 
 # Instala o projeto no ambiente virtual
 RUN --mount=type=cache,target=/root/.cache/uv \
@@ -46,7 +45,6 @@ WORKDIR /app
 # Copia apenas o venv e o código do builder (sem uv nem ferramentas de build)
 COPY --from=builder --chown=app:app /app/.venv /app/.venv
 COPY --from=builder --chown=app:app /app/src /app/src
-COPY --from=builder --chown=app:app /app/containers.py /app/containers.py
 
 USER app
 

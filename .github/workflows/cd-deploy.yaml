@@ -1,0 +1,96 @@
+name: CD - Deploy FastFood to AKS
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  REGISTRY: acrkutcutpostech.azurecr.io
+  APP_IMAGE_NAME: kutcut/videoprocessor
+  CHART_PATH: ./helm
+  RELEASE_NAME: kutcut-videoprocessor
+  AKS_RESOURCE_GROUP: rg-kutcut-postech
+  AKS_CLUSTER_NAME: aks-kutcut-postech
+  NAMESPACE: kutcut
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 1. Login no Azure (OIDC)
+      - name: Azure Login
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID_KAUAN }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID_KAUAN }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID_KAUAN }}
+      # 2. Login no ACR
+      - name: Azure Container Registry Login
+        run: az acr login --name acrkutcutpostech
+
+      # 3. Build e Push das imagens (API e Migrator)
+      - name: Build and push Docker images
+        run: |
+          # Build da imagem da API (estágio 'final')
+          docker build --target final -t $REGISTRY/$APP_IMAGE_NAME:${{ github.sha }} -t $REGISTRY/$APP_IMAGE_NAME:latest .
+          
+          docker push $REGISTRY/$APP_IMAGE_NAME:${{ github.sha }}
+          docker push $REGISTRY/$APP_IMAGE_NAME:latest
+
+      # 4. Conectar no AKS
+      - name: Get AKS credentials
+        run: |
+          az aks get-credentials \
+            --resource-group $AKS_RESOURCE_GROUP \
+            --name $AKS_CLUSTER_NAME \
+            --overwrite-existing \
+            --admin
+
+      # 5. Setup Helm
+      - name: Setup Helm
+        uses: azure/setup-helm@fe7b4081f897010303f10b3ad114f27994073bc3
+        with:
+          version: v3.15.1
+
+      # 6. Validação do Chart (Segurança extra antes de aplicar)
+      - name: Helm Lint
+        run: helm lint $CHART_PATH
+
+      - name: Create Namespace
+        run: kubectl create namespace $NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
+      - name: Create ACR Secret
+        run: |
+          kubectl create secret docker-registry acr-secret \
+            --docker-server=$REGISTRY \
+            --docker-username=$(az acr credential show --name acrkutcutpostech --query "username" -o tsv) \
+            --docker-password=$(az acr credential show --name acrkutcutpostech --query "passwords[0].value" -o tsv) \
+            --namespace $NAMESPACE \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      # 8. Deploy da Aplicação (Com rollback automático)
+      - name: Deploy Application via Helm
+        env:
+          KV_CLIENT_ID: ${{ secrets.KV_IDENTITY_CLIENT_ID }}
+          AZ_TENANT_ID: ${{ secrets.AZURE_TENANT_ID_KAUAN }}
+          KV_SUFFIX: ${{ secrets.KV_SUFFIX }}
+        run: |
+          echo "🚀 Deploy Atômico com Helm em $NAMESPACE..."
+          helm upgrade --install $RELEASE_NAME $CHART_PATH \
+            --namespace $NAMESPACE \
+            --create-namespace \
+            --set image.repository=$REGISTRY/$APP_IMAGE_NAME \
+            --set image.tag=${{ github.sha }} \
+            --set keyVault.enabled=true \
+            --set keyVault.name="$KV_SUFFIX" \
+            --set keyVault.clientId="$KV_CLIENT_ID" \
+            --set keyVault.tenantId="$AZ_TENANT_ID" \
+            --atomic
